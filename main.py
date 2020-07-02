@@ -4,7 +4,8 @@ import pickle
 
 
 app = Flask(__name__)
-model = pickle.load(open('randomForestRegressor.pkl','rb'))
+model = pickle.load(open('bias_model_ensemble.pkl','rb'))
+# model2 = pickle.load(open('bias_model_ensemble.pkl','rb'))
 
 
 @app.route('/')
@@ -22,6 +23,22 @@ def predict():
 
     #output = round(prediction[0], 2)
     return render_template('home.html', prediction_text="AQI for Jaipur {}".format(prediction[0]))
+
+@app.route('/predictBias', methods = ['POST'])
+def predictBias():
+    article = request.form['article']
+    prediction = model.predict([article])
+    print(prediction)
+    return prediction
+
+@app.route('/predict_bias',methods = ['POST'])
+def predict_bias():
+    int_features = [float(x) for x in request.form.values()]
+    final_features = [np.array(int_features)]
+    prediction = model2.predict(final_features)
+    print(prediction[0])
+    return render_template('prediction.html', prediction_text="AQI for Jaipur {}".format(prediction[0]))
+
 
 @app.route('/predict_api',methods=['POST'])
 def predict_api():
